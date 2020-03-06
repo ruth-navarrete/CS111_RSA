@@ -25,16 +25,26 @@ int exponent_by_square(int, int, int);
 
 std::map<char, int> coding;
 
-int main() {
+int main(int argc, char* argv[]) {
     std::string option, input_file;
     std::vector<int> factors;
     int e = 0, n = 0, p = 0, q = 0, d = 0, phi = 0;
+
+std::cout << "t1" << std::endl;
+    e = atoi(argv[1]);
+std::cout << "t2" << std::endl;
+    n = atoi(argv[2]);
+std::cout << "t3" << std::endl;
+    option = argv[3];
+std::cout << "t4" << std::endl;
+    input_file = argv[4];
+std::cout << "t5" << std::endl;
 
     prompt(e, n, p, q, d, option, input_file, phi);
     find_d(d, e, phi);
     populate_coding();
 
-    //printf("e=%d, n=%d, p=%d, q=%d, phi=%d, d=%d", e, n, p, q, phi, d);
+    printf("e=%d, n=%d, p=%d, q=%d, phi=%d, d=%d", e, n, p, q, phi, d);
 
     if (option == "e") {
         encryption(e, n, input_file);
@@ -92,10 +102,8 @@ void prompt(int& e, int& n, int& p, int& q, int& d, std::string& option, std::st
         std::cin >> e >> n >> option >> input_file;
     } while (!check_validity(e, n, p, q, d, phi));
     */
-    std::cin >> e >> n >> option >> input_file;
-    if (!check_validity(e, n, p, q, d, phi)) {
-        exit(1);
-    }
+    //std::cin >> e >> n >> option >> input_file;
+    /*
     option.at(0) = tolower(option.at(0));
 
     if (option.at(0) == 'e') {
@@ -103,6 +111,10 @@ void prompt(int& e, int& n, int& p, int& q, int& d, std::string& option, std::st
     }
     else if (option.at(0) == 'd') {
         option = "d";
+    }
+    */
+    if (!check_validity(e, n, p, q, d, phi)) {
+        exit(1);
     }
 }
 
@@ -115,22 +127,14 @@ bool check_validity(int e, int n, int& p, int& q, int& d, int& phi) {
 
     /* verify that n=pq; p, q are distinct primes */
     if (!find_p_q(n, p, q)) {
-        //std::cout << "find primes false" << std::endl;
         return false;
     }
 
     /* verify gcd(e, phi(n)) == 1 */
     phi = phi_of_n(p, q);
-    //std::cout << "phi=" << phi << std::endl;
     if (gcd(e, phi) != 1) {
-        //std::cout << "gcd false" << std::endl;
         return false;
     }
-    /*
-    else {
-        std::cout << "phi good" << std::endl;
-    }
-    */
 
     return true;
 }
@@ -153,13 +157,10 @@ int gcd(int e, int n) {
 }
 
 int phi_of_n(int p, int q) {
-    //std::cout << "find phi" << std::endl;
-    //std::cout << ((p-1) * (q-1)) << std::endl;
     return ((p-1) * (q-1));
 }
 
 std::vector<int> prime_factors_n(int n) {
-    //std::cout << "find primes" << std::endl;
     std::vector<int> prime_factors;
 
     prime_factors.push_back(1);
@@ -186,7 +187,6 @@ std::vector<int> prime_factors_n(int n) {
 }
 
 bool find_p_q(int n, int& p, int& q) {
-    //std::cout << "find p q" << std::endl;
     std::vector<int> factors = prime_factors_n(n);
 
     int temp_p = 0;
@@ -221,16 +221,15 @@ void find_d(int& d, int e, int phi) {
 }
 
 void encryption(int e, int n, std::string input_file) {
-    //std::cout << "in encryption" << std::endl;
     std::ifstream e_input(input_file);
     std::ofstream e_output("incrypted.txt");
 
     if (e_input.fail()) {
-        //std::cout << "Could not open input file" << std::endl;
+        std::cout << "Could not open input file" << std::endl;
         return;
     }
     if (e_output.fail()) {
-        //std::cout << "Could not open output file" << std::endl;
+        std::cout << "Could not open output file" << std::endl;
         return;
     }
 
@@ -239,44 +238,41 @@ void encryption(int e, int n, std::string input_file) {
     int M = -1;
 
     while (e_input.get(temp_c)) {
-        //std::cout << "in encoding loop" << std::endl;
+        std::cout << "in encoding loop" << std::endl;
 
         if (isalpha(temp_c)) {
             temp_c = toupper(temp_c);
         }
         
         if (coding.find(temp_c) == coding.end()) {
-            //std::cout << "Error encoding" << std::endl;
+            std::cout << "Error encoding" << std::endl;
             exit(1);
         }
 
         M = coding.find(temp_c)->second;
         
-        //std::cout << "character=" << temp_c << ", M=" << M << std::flush;
         C = (exponent_by_square(M, e, n)) % n;
         e_output << C;
         if (e_input.peek() != EOF) {
             e_output << ' ';
         }
-        //std::cout << "C=" << C << std::endl;
     }
 
-    //std::cout << "out of encoding loop" << std::endl;
     e_input.close();
     e_output.close();
 }
 
 void decryption (int d, int n, std::string input_file) {
-    //std::cout << "in de" << std::endl;
+    std::cout << "in decryption" << std::endl;
     std::ifstream d_input(input_file);
     std::ofstream d_output("decrypted.txt");
 
     if (d_input.fail()) {
-        //std::cout << "Could not open input file" << std::endl;
+        std::cout << "Could not open input file" << std::endl;
         return;
     }
     if (d_output.fail()) {
-        //std::cout << "Could not open output file" << std::endl;
+        std::cout << "Could not open output file" << std::endl;
         return;
     }
     
@@ -285,22 +281,22 @@ void decryption (int d, int n, std::string input_file) {
     int C = -1;
     int M = -1;
     while (d_input >> temp_i) {
-        //std::cout << "in decoding loop" << std::endl;
+        std::cout << "in decoding loop" << std::endl;
         C = (int)temp_i;
 
         M = exponent_by_square(C, d, n) % n;
 
-        //std::cout << "C=" << temp_i << "M=" << M << std::flush;
+        std::cout << "C=" << temp_i << ", M=" << M << std::flush;
 
         for (std::map<char, int>::iterator it = coding.begin(); it != coding.end(); it++) {
             if (it->second == M)  {
                 d_output << it->first;
-                //std::cout << "character=" << it->first << std::endl;
+                std::cout << ", character=" << it->first << std::endl;
             }
         }
     }
 
-    //std::cout << "out of decoding loop" << std::endl;
+    std::cout << "out of decoding loop" << std::endl;
 
     d_input.close();
     d_output.close();
@@ -362,12 +358,10 @@ int exponent_by_square(int C, int d, int n) {
         return C % n;
     }
     if ((d % 2) == 0) {
-        //printf("C=%d, d=%d\n", C, d);
         long int test = exponent_by_square((C * C) % n, d / 2, n);
         return test % n;
     }
     else {
-        //printf("C=%d, d=%d\n", C, d);
         long int test = exponent_by_square((C * C) % n, d / 2, n) * (C % n);
         return test % n;
     }
